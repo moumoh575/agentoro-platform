@@ -6,43 +6,48 @@
     <title>Agentoro - Connect Instagram</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .fb-button { background-color: #1877F2; color: white; transition: 0.3s; border-radius: 8px; padding: 12px 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; cursor: pointer; border: none; }
-        .fb-button:hover { background-color: #166fe5; }
+        .fb-button { background-color: #1877F2; color: white; transition: 0.3s; border-radius: 8px; padding: 12px 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; cursor: pointer; }
+        .account-card { cursor: pointer; transition: 0.2s; border: 2px solid transparent; }
+        .account-card:hover { border-color: #3b82f6; background-color: #f0f7ff; }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
     <div id="app" class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md text-center">
-        <h1 class="text-2xl font-bold text-blue-600 mb-6">Agentoro Tech</h1>
+        <h1 class="text-2xl font-bold text-blue-600 mb-6">Agentoro Automation</h1>
         
         <div id="login-section">
-            <p class="text-gray-600 mb-6">يرجى ربط حساب Instagram Professional الخاص بك لتفعيل خدمة الرد الآلي.</p>
+            <p class="text-gray-600 mb-6">اضغط للاتصال بفيسبوك واختيار حساب إنستغرام الخاص بك.</p>
             <button onclick="loginWithFacebook()" class="fb-button">
                 <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 Connect with Facebook
             </button>
         </div>
 
-        <div id="profile-section" class="hidden">
+        <div id="selection-section" class="hidden">
+            <h2 class="text-lg font-bold mb-4">اختر حساب إنستغرام لربطه:</h2>
+            <div id="accounts-list" class="space-y-3">
+                </div>
+        </div>
+
+        <div id="success-section" class="hidden">
             <div class="flex flex-col items-center">
-                <img id="user-img" src="" class="w-20 h-20 rounded-full border-2 border-blue-500 mb-3">
-                <h2 id="user-name" class="text-lg font-bold"></h2>
-                <p class="text-green-500 text-sm">تم الربط بنجاح! حسابك جاهز للأتمتة.</p>
+                <div class="relative mb-4">
+                    <img id="selected-img" src="" class="w-20 h-20 rounded-full border-4 border-blue-500 shadow-md">
+                    <div class="absolute bottom-0 right-0 bg-green-500 w-6 h-6 rounded-full border-2 border-white"></div>
+                </div>
+                <h2 id="selected-name" class="text-xl font-bold"></h2>
+                <p class="text-green-600 mt-2">تم تفعيل الأتمتة لهذا الحساب بنجاح!</p>
+                <button onclick="location.reload()" class="mt-6 text-blue-600 text-sm underline">ربط حساب آخر</button>
             </div>
         </div>
     </div>
 
     <script>
-        // الـ App ID الخاص بك تم وضعه هنا
         const APP_ID = '1435934461170151';
 
         window.fbAsyncInit = function() {
-            FB.init({
-                appId      : APP_ID,
-                cookie     : true,
-                xfbml      : true,
-                version    : 'v20.0'
-            });
+            FB.init({ appId: APP_ID, cookie: true, xfbml: true, version: 'v20.0' });
         };
 
         (function(d, s, id){
@@ -56,26 +61,53 @@
         function loginWithFacebook() {
             FB.login(function(response) {
                 if (response.authResponse) {
-                    FB.api('/me/accounts?fields=instagram_business_account{name,username,profile_picture_url}', function(res) {
-                        if (res.data) {
-                            // البحث عن أول حساب إنستغرام مرتبطة بصفحة
-                            const page = res.data.find(p => p.instagram_business_account);
-                            if (page && page.instagram_business_account) {
-                                showProfile(page.instagram_business_account);
-                            } else {
-                                alert("لم نجد حساب Instagram Professional مرتبطاً بصفحاتك.");
-                            }
-                        }
-                    });
+                    fetchInstagramAccounts();
                 }
             }, {scope: 'public_profile,instagram_basic,pages_show_list,instagram_manage_messages'});
         }
 
-        function showProfile(data) {
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('profile-section').classList.remove('hidden');
-            document.getElementById('user-name').innerText = data.name || data.username;
-            document.getElementById('user-img').src = data.profile_picture_url;
+        function fetchInstagramAccounts() {
+            FB.api('/me/accounts?fields=instagram_business_account{id,name,username,profile_picture_url}', function(res) {
+                const listContainer = document.getElementById('accounts-list');
+                listContainer.innerHTML = '';
+                
+                let foundAny = false;
+
+                if (res.data) {
+                    res.data.forEach(page => {
+                        if (page.instagram_business_account) {
+                            foundAny = true;
+                            const ig = page.instagram_business_account;
+                            const div = document.createElement('div');
+                            div.className = "account-card p-4 rounded-xl bg-gray-50 flex items-center gap-4 text-right";
+                            div.onclick = () => finishBinding(ig);
+                            div.innerHTML = `
+                                <img src="${ig.profile_picture_url}" class="w-12 h-12 rounded-full border border-gray-200">
+                                <div class="flex-1">
+                                    <p class="font-bold text-gray-800">${ig.name || ig.username}</p>
+                                    <p class="text-xs text-gray-500">Instagram Professional</p>
+                                </div>
+                                <span class="text-blue-500 font-bold text-sm">اختر</span>
+                            `;
+                            listContainer.appendChild(div);
+                        }
+                    });
+                }
+
+                if (foundAny) {
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('selection-section').classList.remove('hidden');
+                } else {
+                    alert("لم نجد أي حساب إنستغرام مربوط بصفحاتك. تأكد من الربط في إعدادات فيسبوك.");
+                }
+            });
+        }
+
+        function finishBinding(ig) {
+            document.getElementById('selection-section').classList.add('hidden');
+            document.getElementById('success-section').classList.remove('hidden');
+            document.getElementById('selected-name').innerText = ig.name || ig.username;
+            document.getElementById('selected-img').src = ig.profile_picture_url;
         }
     </script>
 </body>
