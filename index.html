@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentoro - Connect Instagram</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fb-button { background-color: #1877F2; color: white; transition: 0.3s; border-radius: 8px; padding: 12px 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; cursor: pointer; border: none; }
+        .fb-button:hover { background-color: #166fe5; }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div id="app" class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md text-center">
+        <h1 class="text-2xl font-bold text-blue-600 mb-6">Agentoro Tech</h1>
+        
+        <div id="login-section">
+            <p class="text-gray-600 mb-6">يرجى ربط حساب Instagram Professional الخاص بك لتفعيل خدمة الرد الآلي.</p>
+            <button onclick="loginWithFacebook()" class="fb-button">
+                <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Connect with Facebook
+            </button>
+        </div>
+
+        <div id="profile-section" class="hidden">
+            <div class="flex flex-col items-center">
+                <img id="user-img" src="" class="w-20 h-20 rounded-full border-2 border-blue-500 mb-3">
+                <h2 id="user-name" class="text-lg font-bold"></h2>
+                <p class="text-green-500 text-sm">تم الربط بنجاح! حسابك جاهز للأتمتة.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // الـ App ID الخاص بك تم وضعه هنا
+        const APP_ID = '1435934461170151';
+
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : APP_ID,
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v20.0'
+            });
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function loginWithFacebook() {
+            FB.login(function(response) {
+                if (response.authResponse) {
+                    FB.api('/me/accounts?fields=instagram_business_account{name,username,profile_picture_url}', function(res) {
+                        if (res.data) {
+                            // البحث عن أول حساب إنستغرام مرتبطة بصفحة
+                            const page = res.data.find(p => p.instagram_business_account);
+                            if (page && page.instagram_business_account) {
+                                showProfile(page.instagram_business_account);
+                            } else {
+                                alert("لم نجد حساب Instagram Professional مرتبطاً بصفحاتك.");
+                            }
+                        }
+                    });
+                }
+            }, {scope: 'public_profile,instagram_basic,pages_show_list,instagram_manage_messages'});
+        }
+
+        function showProfile(data) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('profile-section').classList.remove('hidden');
+            document.getElementById('user-name').innerText = data.name || data.username;
+            document.getElementById('user-img').src = data.profile_picture_url;
+        }
+    </script>
+</body>
+</html>
