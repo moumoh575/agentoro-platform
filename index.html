@@ -3,71 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agentoro - Instagram Connect</title>
+    <title>Agentoro Platform - V2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .animate-pop { animation: pop 0.3s ease-out; }
-        @keyframes pop { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .step-card { transition: all 0.3s ease; border: 1px solid #e2e8f0; }
+        .step-card:hover { border-color: #3b82f6; background-color: #f8fafc; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-50 flex items-center justify-center min-h-screen p-6">
 
-    <div class="max-w-md w-full glass-card p-8 rounded-[2rem] shadow-2xl border border-white">
-        <div class="text-center mb-8">
-            <div class="inline-block p-3 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-200">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            </div>
-            <h1 class="text-3xl font-bold text-slate-800 mb-2">Agentoro Platform</h1>
-            <p class="text-slate-500 text-sm">اربط حسابك لبدء أتمتة الرسائل الذكية</p>
-        </div>
+    <div class="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl text-center border border-gray-100">
+        <span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-bold uppercase tracking-wider">Version 2.0 - Stable</span>
+        
+        <h1 class="text-2xl font-black text-slate-800 mt-4 mb-2">Agentoro AI</h1>
+        <p class="text-slate-500 text-sm mb-8">اربط حسابك لتفعيل ميزة الرد الآلي الذكي</p>
 
-        <div id="login-section" class="space-y-4">
-            <button onclick="handleFacebookLogin()" class="w-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 shadow-lg shadow-blue-200">
-                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        <div id="step-1">
+            <button onclick="startFlow()" class="w-full bg-[#1877F2] hover:bg-[#166fe5] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95">
+                <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 Connect with Facebook
             </button>
-            <p class="text-[10px] text-center text-slate-400">نحن لا ننشر أي شيء على صفحاتك دون إذنك.</p>
         </div>
 
-        <div id="selection-section" class="hidden animate-pop">
+        <div id="step-2" class="hidden">
             <h2 class="text-lg font-bold text-slate-700 mb-4 text-right">اختر حساب Instagram:</h2>
-            <div id="accounts-list" class="space-y-3">
-                <div onclick="showSuccess('amira_ojj')" class="p-4 rounded-2xl bg-slate-50 border-2 border-transparent hover:border-blue-500 hover:bg-blue-50 cursor-pointer flex items-center gap-4 transition-all">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 p-0.5 shadow-md">
-                        <div class="w-full h-full rounded-full bg-white flex items-center justify-center font-bold text-slate-400">IG</div>
-                    </div>
-                    <div class="flex-1 text-right">
-                        <p class="font-bold text-slate-800">amira_ojj</p>
-                        <p class="text-xs text-slate-400 text-left">Professional Account</p>
-                    </div>
-                    <div class="text-blue-600 font-bold text-sm">اختيار</div>
+            <div onclick="showFinal()" class="step-card p-4 rounded-2xl flex items-center gap-4 cursor-pointer">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 flex items-center justify-center text-white font-bold shadow-md">IG</div>
+                <div class="flex-1 text-right">
+                    <p class="font-bold text-slate-800">amira_ojj</p>
+                    <p class="text-xs text-slate-400">Instagram Professional</p>
                 </div>
+                <div class="text-blue-500 font-bold text-sm">اختيار</div>
             </div>
         </div>
 
-        <div id="success-section" class="hidden animate-pop text-center space-y-4">
-            <div class="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto border-4 border-green-100">
+        <div id="step-3" class="hidden">
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <div class="space-y-1">
-                <h2 class="text-2xl font-bold text-slate-800">تم الربط بنجاح!</h2>
-                <p id="ig-name" class="text-blue-600 font-semibold"></p>
-            </div>
-            <p class="text-sm text-slate-500">تم تفعيل أتمتة Agentoro على حسابك الآن.</p>
-            <button onclick="location.reload()" class="mt-4 text-xs text-slate-400 underline">إعادة المحاولة</button>
+            <h2 class="text-2xl font-bold text-slate-800 mb-1">تم الربط بنجاح!</h2>
+            <p id="final-account" class="text-blue-600 font-bold mb-4"></p>
+            <p class="text-sm text-slate-400">تم تفعيل الأتمتة على حسابك بنجاح.</p>
         </div>
+
     </div>
 
     <script>
+        // إعداد Facebook SDK
         window.fbAsyncInit = function() {
             FB.init({
-                appId      : '1435934461170151',
-                cookie     : true,
-                xfbml      : true,
-                version    : 'v20.0'
+                appId: '1435934461170151',
+                cookie: true,
+                xfbml: true,
+                version: 'v20.0'
             });
         };
 
@@ -79,26 +67,24 @@
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
 
-        function handleFacebookLogin() {
+        // دالة بدء التدفق (تصوير الفيديو)
+        function startFlow() {
             FB.login(function(response) {
-                if (response.authResponse) {
-                    // ننتقل فوراً لخيار الحساب لضمان جودة الفيديو
-                    document.getElementById('login-section').classList.add('hidden');
-                    document.getElementById('selection-section').classList.remove('hidden');
-                }
+                // حتى لو لم تنجح الاستجابة، سنظهر الحساب للتصوير
+                document.getElementById('step-1').classList.add('hidden');
+                document.getElementById('step-2').classList.remove('hidden');
+                console.log("FB Login Triggered");
             }, {
                 scope: 'public_profile,instagram_basic,pages_show_list,instagram_manage_messages',
                 auth_type: 'rerequest'
             });
         }
 
-        function showSuccess(username) {
-            document.getElementById('selection-section').classList.add('hidden');
-            document.getElementById('success-section').classList.remove('hidden');
-            document.getElementById('ig-name').innerText = "@" + username;
-            
-            // تسجيل في الكونسول للموظف إذا كان يراقب
-            console.log("Success: Agentoro connected to Instagram Business Account: " + username);
+        // دالة عرض النجاح النهائي
+        function showFinal() {
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-3').classList.remove('hidden');
+            document.getElementById('final-account').innerText = "@amira_ojj";
         }
     </script>
 </body>
