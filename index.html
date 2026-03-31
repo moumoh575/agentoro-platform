@@ -2,120 +2,81 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agentoro - Connect Instagram</title>
+    <title>Agentoro - Connect</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
-    </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen flex items-center justify-center p-4">
-
-    <div class="max-w-md w-full glass-card p-8 rounded-3xl shadow-2xl border border-white">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-blue-900 mb-2">Agentoro Tech</h1>
-            <p class="text-gray-600">يرجى ربط حساب Instagram Professional الخاص بك لتفعيل خدمة الرد الآلي.</p>
-        </div>
-
-        <div id="login-section" class="space-y-4">
-            <button onclick="loginWithFacebook()" class="w-full bg-[#1877F2] hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02]">
-                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
+        <h1 class="text-2xl font-bold text-blue-600 mb-6">Agentoro Tech</h1>
+        
+        <div id="login-section">
+            <button onclick="loginWithFacebook()" class="bg-[#1877F2] text-white px-6 py-3 rounded-lg font-bold w-full">
                 Connect with Facebook
             </button>
         </div>
 
-        <div id="selection-section" class="hidden animate-fade-in">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">اختر حساب الإنستغرام:</h2>
-            <div id="accounts-list" class="space-y-3">
-                </div>
-        </div>
-
-        <div id="success-section" class="hidden text-center space-y-4">
-            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800">تم الربط بنجاح!</h2>
-            <p id="connected-name" class="text-blue-600 font-medium"></p>
-            <p class="text-sm text-gray-500">يمكنك الآن إغلاق هذه الصفحة والعودة للمنصة.</p>
+        <div id="selection-section" class="hidden">
+            <h2 class="mb-4 font-bold">اختر حسابك:</h2>
+            <div id="accounts-list" class="space-y-2"></div>
         </div>
     </div>
 
     <script>
         window.fbAsyncInit = function() {
-            FB.init({
-                appId      : '1435934461170151', // ID تطبيقك الصحيح
-                cookie     : true,
-                xfbml      : true,
-                version    : 'v20.0'
-            });
+            FB.init({ appId: '1435934461170151', cookie: true, xfbml: true, version: 'v20.0' });
         };
 
         (function(d, s, id){
             var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) {return;}
+            if (d.getElementById(id)) return;
             js = d.createElement(s); js.id = id;
             js.src = "https://connect.facebook.net/en_US/sdk.js";
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
 
         function loginWithFacebook() {
-            // استخدام rerequest لضمان طلب الصلاحيات المفقودة دائماً
             FB.login(function(response) {
-                if (response.authResponse) {
-                    fetchInstagramAccounts();
-                }
+                if (response.authResponse) fetchAccounts();
             }, {
                 scope: 'public_profile,instagram_basic,pages_show_list,instagram_manage_messages',
-                auth_type: 'rerequest' 
+                auth_type: 'rerequest'
             });
         }
 
-        function fetchInstagramAccounts() {
-            // طلب الصفحات وحسابات الإنستغرام المرتبطة بها دفعة واحدة
-            FB.api('/me/accounts?fields=instagram_business_account{id,name,username,profile_picture_url},name', function(res) {
-                const listContainer = document.getElementById('accounts-list');
-                listContainer.innerHTML = '';
-                let foundAny = false;
+        function fetchAccounts() {
+            // جلب الصفحات وحسابات الانستغرام المرتبطة بها
+            FB.api('/me/accounts?fields=name,instagram_business_account{id,username,profile_picture_url}', function(response) {
+                const list = document.getElementById('accounts-list');
+                list.innerHTML = '';
+                let found = false;
 
-                if (res && res.data) {
-                    res.data.forEach(page => {
+                if (response.data) {
+                    response.data.forEach(page => {
                         if (page.instagram_business_account) {
-                            foundAny = true;
+                            found = true;
                             const ig = page.instagram_business_account;
-                            const div = document.createElement('div');
-                            div.className = "p-4 rounded-xl bg-gray-50 flex items-center gap-4 cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all shadow-sm";
-                            div.onclick = () => finishBinding(ig.username);
-                            div.innerHTML = `
-                                <img src="${ig.profile_picture_url}" class="w-12 h-12 rounded-full border-2 border-white shadow-sm">
-                                <div class="flex-1 text-right">
-                                    <p class="font-bold text-gray-800">${ig.username}</p>
-                                    <p class="text-xs text-gray-500">صفحة: ${page.name}</p>
+                            const item = document.createElement('div');
+                            item.className = "p-3 border rounded-lg cursor-pointer hover:bg-blue-50 flex items-center gap-3";
+                            item.onclick = () => alert('تم اختيار: ' + ig.username);
+                            item.innerHTML = `
+                                <img src="${ig.profile_picture_url}" class="w-10 h-10 rounded-full">
+                                <div class="text-right">
+                                    <p class="font-bold">${ig.username}</p>
+                                    <p class="text-xs text-gray-500">عبر صفحة: ${page.name}</p>
                                 </div>
-                                <div class="text-blue-500 font-bold">إختيار</div>
                             `;
-                            listContainer.appendChild(div);
+                            list.appendChild(item);
                         }
                     });
                 }
 
-                if (foundAny) {
+                if (found) {
                     document.getElementById('login-section').classList.add('hidden');
                     document.getElementById('selection-section').classList.remove('hidden');
                 } else {
-                    alert("تنبيه: لم نجد حساب Instagram Professional مرتبط بصفحاتك. تأكد من الربط في إعدادات فيسبوك.");
+                    alert("لم نجد حساب إنستغرام احترافي مرتبط بصفحة فيسبوك. تأكد من الربط في إعدادات الصفحة.");
                 }
             });
-        }
-
-        function finishBinding(username) {
-            document.getElementById('selection-section').classList.add('hidden');
-            document.getElementById('success-section').classList.remove('hidden');
-            document.getElementById('connected-name').innerText = "@" + username;
-            
-            // هنا يمكنك إرسال البيانات إلى backend الخاص بك (Agentoro)
-            console.log("تم اختيار الحساب:", username);
         }
     </script>
 </body>
